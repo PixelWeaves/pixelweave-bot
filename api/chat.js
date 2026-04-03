@@ -1,15 +1,18 @@
 export default async function handler(req, res) {
-  // Set CORS headers
+  // Set CORS headers for all requests
   res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Credentials", "false");
   res.setHeader(
     "Access-Control-Allow-Methods",
-    "GET, OPTIONS, PATCH, DELETE, POST, PUT",
+    "GET, HEAD, PUT, PATCH, POST, DELETE, OPTIONS",
   );
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization",
+    "Content-Type, Authorization, X-Requested-With",
   );
+  res.setHeader("Access-Control-Max-Age", "86400");
 
+  // Handle preflight requests
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
