@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       model: "gemini-2.5-flash-lite",
       contents: `
         Query: ${query}
-        Return: A single concise, natural, accurate answer (1–3 short paragraphs). If the draft lacks necessary info, return exactly: Sorry! I am unable to understand your question. Please contact PixelWeave Team directly at pixelweave.tech@gmail.com.
+        Return: A single concise, natural, accurate answer (1–3 short paragraphs). If the draft lacks necessary info, return exactly: Sorry! I am unable to understand your question. Please contact PixelWeave Team directly at info@pixelweave.tech.
         `,
       config: {
         thinkingConfig: {
