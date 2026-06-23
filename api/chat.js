@@ -33,6 +33,6 @@ export default async function handler(req, res) {
 
     res.status(200).json({ message: response.text, "request.header": req.header });
   } catch (e) {
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ message: "Internal Server Error: "+ e.message });
   }
 }
