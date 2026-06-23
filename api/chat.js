@@ -14,7 +14,7 @@ export default async function handler(req, res) {
 
     const ai = new GoogleGenAI({});
 
-    const data = ``;
+    const data = await getData();
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash-lite",
@@ -35,4 +35,14 @@ export default async function handler(req, res) {
   } catch (e) {
     res.status(500).json({ message: "Internal Server Error: " + e.message });
   }
+}
+
+async function getData(){
+  const res = await fetch('https://json.pixelweave.workers.dev/',{
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  return await res.json();
 }
