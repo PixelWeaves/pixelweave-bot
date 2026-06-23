@@ -1,130 +1,38 @@
 export default async function handler(req, res) {
 
-  // Handle preflight requests
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
+  if (req.method === 'OPTIONS') {
+    return res.status(200).json({ success: 'ok' });
   }
 
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+  if (req.method !== 'POST' && req.method !== 'OPTIONS') {
+    return res.status(405).json({ error: 'Not allowed' });
   }
-
   try {
-    const {
-      query,
-      systemPrompt,
-      fallbackMessage = "Unable to understand the query. Please contact us directly.",
-    } = req.body || {};
 
-    if (!query || !systemPrompt) {
-      return res.status(400).json({ error: "Missing query or systemPrompt" });
-    }
+    const { query } = req.body;
+    const { GoogleGenAI } = await import('@google/genai');
 
-    const errors = [];
+    const ai = new GoogleGenAI({});
 
-    // Try OpenAI first
-    try {
-      const openaiKey = process.env.OPENAI_API_KEY;
-      if (openaiKey && !openaiKey.startsWith("YOUR_")) {
-        const response = await fetch(
-          "https://api.openai.com/v1/chat/completions",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${openaiKey}`,
-            },
-            body: JSON.stringify({
-              model: process.env.OPENAI_MODEL || "gpt-4o-mini",
-              messages: [
-                { role: "system", content: systemPrompt },
-                { role: "user", content: query },
-              ],
-              temperature: 0.4,
-              max_tokens: 220,
-            }),
-          },
-        );
+    const data = ``;
 
-        const text = await response.text();
-        if (response.ok) {
-          const json = JSON.parse(text);
-          const message = json?.choices?.[0]?.message?.content?.trim();
-          if (message) {
-            return res.status(200).json({ message, provider: "openai" });
-          }
-        } else {
-          errors.push({
-            provider: "openai",
-            status: response.status,
-            message: text.substring(0, 200),
-          });
-        }
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash-lite",
+      contents: `
+        Query: ${query}
+        Return: A single concise, natural, accurate answer (1–3 short paragraphs). If the draft lacks necessary info, return exactly: Sorry! I am unable to understand your question. Please contact Ali Amir directly at muhammadaliamir24@gmail.com.
+        `,
+      config: {
+        thinkingConfig: {
+          thinkingBudget: 0, // Disables thinking
+        },
+        temperature: 0.2,
+        systemInstruction: `You are a personal ai assistant of PixelWeave, a tech startup that empowers other businesses to grow, and is hosted on official Pixelweave website. Your primary task is to assist website visitors by answering their queries on brand\'s behalf. Here is some of the information about the company. DATA: ${data}\nUse ONLY given information. Do NOT invent facts. Output ONLY the final answer text — no JSON, no commentary, nothing else.`
       }
-    } catch (error) {
-      errors.push({ provider: "openai", error: String(error.message) });
-    }
-
-    // Try Gemini as fallback
-    try {
-      const geminiKey = process.env.GEMINI_API_KEY;
-      if (geminiKey && !geminiKey.startsWith("YOUR_")) {
-        const model = process.env.GEMINI_MODEL || "gemini-2.0-flash";
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(geminiKey)}`;
-
-        const response = await fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            systemInstruction: {
-              parts: [{ text: systemPrompt }],
-            },
-            contents: [
-              {
-                role: "user",
-                parts: [{ text: query }],
-              },
-            ],
-            generationConfig: {
-              temperature: 0.4,
-              maxOutputTokens: 220,
-            },
-          }),
-        });
-
-        const text = await response.text();
-        if (response.ok) {
-          const json = JSON.parse(text);
-          const message = json?.candidates?.[0]?.content?.parts
-            ?.map((part) => part?.text || "")
-            .join("")
-            .trim();
-          if (message) {
-            return res.status(200).json({ message, provider: "gemini" });
-          }
-        } else {
-          errors.push({
-            provider: "gemini",
-            status: response.status,
-            message: text.substring(0, 200),
-          });
-        }
-      }
-    } catch (error) {
-      errors.push({ provider: "gemini", error: String(error.message) });
-    }
-
-    // All providers failed, return fallback
-    return res.status(200).json({
-      message: fallbackMessage,
-      provider: "fallback",
-      errors: errors,
     });
-  } catch (error) {
-    console.error("Chat API error:", error);
-    return res.status(500).json({
-      error: "Internal server error",
-      details: String(error.message || error),
-    });
+
+    res.status(200).json({ message: response.text, "reqest.header": req.header });
+  } catch (e) {
+    res.status(500).json({ message: "Internal Server Error" });
   }
 }
