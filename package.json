@@ -1,0 +1,23 @@
+{
+  "name": "pixelweave-bot",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {},
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pixelweaves/pixelweave-bot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pixelweaves/pixelweave-bot/issues"
+  },
+  "homepage": "https://github.com/pixelweaves/pixelweave-bot#readme",
+  "description": "",
+  "dependencies": {
+    "@google/genai": "^1.15.0",
+    "cors": "^2.8.5"
+  }
+}
