@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       model: "gemini-2.5-flash-lite",
       contents: `
         Query: ${query}
-        Return: A single concise, natural, accurate answer (1–3 short paragraphs). If the draft lacks necessary info, return exactly: Sorry! I am unable to understand your question. Please contact Ali Amir directly at muhammadaliamir24@gmail.com.
+        Return: A single concise, natural, accurate answer (1–3 short paragraphs). If the draft lacks necessary info, return exactly: Sorry! I am unable to understand your question. Please contact PixelWeave Team directly at pixelweave.tech@gmail.com.
         `,
       config: {
         thinkingConfig: {
@@ -31,7 +31,7 @@ export default async function handler(req, res) {
       }
     });
 
-    res.status(200).json({ message: response.text, "reqest.header": req.header });
+    res.status(200).json({ message: response.text, "request.header": req.header });
   } catch (e) {
     res.status(500).json({ message: "Internal Server Error" });
   }
